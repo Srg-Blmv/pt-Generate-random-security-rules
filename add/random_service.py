@@ -36,6 +36,7 @@ def auth():
 
 
 def random_service():
+  auth()
   url_serv  = f"https://{mgmt_ip}/api/v2/CreateService"
   possible_transport = ["SERVICE_PROTOCOL_TCP", "SERVICE_PROTOCOL_UDP"]
   for i in range(obj_num):
@@ -61,11 +62,11 @@ def random_service():
 
 
 
-mgmt_ip = "192.168.1.100"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 obj_num = 100
 
 
-auth()
+
 random_service()

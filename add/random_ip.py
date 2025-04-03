@@ -40,7 +40,7 @@ def auth():
 
 
 def random_ip():
-
+  auth()
   url_serv  = f"https://{mgmt_ip}/api/v2/CreateNetworkObject"
 
   ip_range_start = ipaddress.IPv4Address('1.0.0.0')
@@ -68,11 +68,11 @@ def random_ip():
 
 
 
-mgmt_ip = "192.168.1.100"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 obj_num = 100
 
 
-auth()
+
 random_ip()

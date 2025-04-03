@@ -59,6 +59,7 @@ def get_rules():
 
 
 def main():
+    auth()
     id_rules = get_rules()
     for i in id_rules:
         url = f"https://{mgmt_ip}:443/api/v2/DeleteSecurityRule"
@@ -74,10 +75,10 @@ def main():
 
 
 
-mgmt_ip = "192.168.1.100"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 
 
-auth()
+
 main()

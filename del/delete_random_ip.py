@@ -61,6 +61,7 @@ def get_ip():
 
 # ---------------  DEL IP  ----------------
 def remove_ip():
+    auth()
     dest_src_objects = get_ip()
     for i in dest_src_objects:
         url = f"https://{mgmt_ip}:443/api/v2/DeleteNetworkObject"
@@ -76,10 +77,8 @@ def remove_ip():
 
 
 
-mgmt_ip = "192.168.1.100"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 
-
-auth()
 remove_ip()

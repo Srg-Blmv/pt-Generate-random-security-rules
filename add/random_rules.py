@@ -37,13 +37,29 @@ def auth():
 
 
 
+def get_app():
+    # ---------------------  GET APP ----------------------
+    url = f"https://{mgmt_ip}:443//api/v2/ListApplications"
+    payload = {
+        "deviceGroupId": global_gr_id,
+        "offset": 0,
+        "limit": 10000
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers, cookies=cookies, verify=False)
+
+    if response.status_code == 200:
+        data = response.json()
+        #print(data)
+        app =  [item["id"] for item in data["applications"]]
+        return app 
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        exit()
 
 def get_ip():
     # ---------------------  GET IP ----------------------
     url = f"https://{mgmt_ip}:443/api/v2/ListNetworkObjects"
-
-
-
     payload = {
         "deviceGroupId": global_gr_id,
         "objectKinds": ["OBJECT_NETWORK_KIND_IPV4_ADDRESS"],
@@ -108,13 +124,12 @@ def get_zones():
         print(f"Error: {response.status_code} - {response.text}")
         exit()
 
-
     
 
 
 
 def random_rules():
-  
+  auth()
   possible_action = ["SECURITY_RULE_ACTION_DROP", "SECURITY_RULE_ACTION_ALLOW", "SECURITY_RULE_ACTION_DENY","SECURITY_RULE_ACTION_RESET_SERVER","SECURITY_RULE_ACTION_RESET_CLIENT","SECURITY_RULE_ACTION_RESET_BOTH"]
   possible_log = ["SECURITY_RULE_LOG_MODE_NO_LOG", "SECURITY_RULE_LOG_MODE_AT_SESSION_START", "SECURITY_RULE_LOG_MODE_AT_SESSION_END", "SECURITY_RULE_LOG_MODE_AT_RULE_HIT", "SECURITY_RULE_LOG_MODE_AT_SESSION_START_AND_END"]
   
@@ -125,7 +140,7 @@ def random_rules():
   dest_objects, src_objects = get_ip()
   id_dict_services = get_service()
   zones = get_zones()
-
+  app = get_app()
 
   for i in range(obj_num):
     random_id_dict_services = random.choice(id_dict_services)
@@ -135,6 +150,7 @@ def random_rules():
     random_log = random.choice(possible_log)
     random_zone_src = random.choice(zones)
     random_zone_dst = random.choice(zones)
+    random_app = random.choice(app)
     payload = {
     "deviceGroupId": global_gr_id,
     "precedence": "pre",
@@ -187,8 +203,12 @@ def random_rules():
         }
     },
     "application": {
-        "kind": "RULE_KIND_ANY",
-        "objects": {}
+        "kind": "RULE_KIND_LIST",
+        "objects": {
+        "array": [
+                random_app
+            ]
+        }
     },
     "urlCategory": {
         "kind": "RULE_KIND_ANY",
@@ -206,11 +226,11 @@ def random_rules():
 
 
 
-mgmt_ip = "192.168.1.100"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 obj_num = 150
 
 
-auth()
+
 random_rules()

@@ -66,6 +66,7 @@ def get_service():
 
 
 def remove_service():
+    auth()
     # ---------------  DEL service r_ ----------------
     id_dict_services = get_service()
     for i in id_dict_services:
@@ -80,10 +81,10 @@ def remove_service():
             print(f"Error: {response.status_code} - {response.text} - ID RULE: {i}")
 
 
-mgmt_ip = "192.168.1.100"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 
 
-auth()
+
 remove_service()
