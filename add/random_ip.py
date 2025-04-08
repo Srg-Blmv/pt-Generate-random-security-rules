@@ -29,15 +29,25 @@ def auth():
         r = requests.post(url, headers=headers, verify=False, cookies=response_auth.cookies)
         cookies = response_auth.cookies
         # ПОЛУЧАЕМ ID глобальной группы
-        global_gr_id = r.json()['groups'][0]['id']
-        # Пример 1 группы в глобальной:
-        # global_gr_id = (r.json()['groups'][0].get("subgroups")[0].get('id'))
+        global_gr_id = get_id_groupe(r.json()['groups'][0])
         # Или заберите нужное ID через web api интерфейс: https://IP_MGMT/apidoc/v2/ui/#tag/device-groups/POST/api/v2/GetDeviceGroupsTree
 
     else:
         print("auth fail")
         exit()
 
+
+def get_id_groupe(groups):
+    # Проверка текущей группы
+    if groups.get("name") == groupe_name:
+        return groups.get("id")
+    # Проверка вложенных групп, если они существуют
+    if "subgroups" in groups:
+        for subgroup in groups["subgroups"]:  # Проходим по списку подгрупп
+            result = get_id_groupe(subgroup)
+            if result:  # Если id найдено, возвращаем его
+                return result
+    return None  # Возвращаем None, если ничего не найдено
 
 def random_ip():
   auth()
@@ -71,6 +81,7 @@ def random_ip():
 mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
+groupe_name= "Global"
 obj_num = 100
 
 

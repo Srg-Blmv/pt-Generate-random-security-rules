@@ -46,8 +46,6 @@ def get_id_groupe(groups):
                 return result
     return None  # Возвращаем None, если ничего не найдено
 
-
-
 def get_app():
     # ---------------------  GET APP ----------------------
     url = f"https://{mgmt_ip}:443//api/v2/ListApplications"
@@ -151,15 +149,17 @@ def random_rules():
   dest_objects, src_objects = get_ip()
   id_dict_services = get_service()
   zones = get_zones()
+  app = get_app()
 
   for i in range(obj_num):
-    random_id_dict_services = random.choice(id_dict_services)
-    random_dest_objects = random.choice(dest_objects)
-    random_src_objects = random.choice(src_objects)
+    random_id_dict_services = random.sample(id_dict_services, k=5)
+    random_dest_objects = random.sample(dest_objects, k=5)
+    random_src_objects = random.sample(src_objects, k=5)
     random_action = random.choice(possible_action)
     random_log = random.choice(possible_log)
     random_zone_src = random.choice(zones)
     random_zone_dst = random.choice(zones)
+    random_app = random.choice(app)
     payload = {
     "deviceGroupId": global_gr_id,
     "precedence": "pre",
@@ -186,17 +186,17 @@ def random_rules():
     "sourceAddr": {
         "kind": "RULE_KIND_LIST",
         "objects": {
-            "array": [
+            "array": 
                 random_src_objects
-            ]
+            
         }
     },
     "destinationAddr": {
         "kind": "RULE_KIND_LIST",
         "objects": {
-            "array": [
+            "array": 
                 random_dest_objects
-            ]
+            
         }
     },
     "sourceUser": {
@@ -206,14 +206,17 @@ def random_rules():
     "service": {
         "kind": "RULE_KIND_LIST",
         "objects": {
-            "array": [
+            "array": 
                 random_id_dict_services
-            ]
         }
     },
     "application": {
-        "kind": "RULE_KIND_ANY",
-        "objects": {}
+        "kind": "RULE_KIND_LIST",
+        "objects": {
+        "array": [
+                random_app
+            ]
+        }
     },
     "urlCategory": {
         "kind": "RULE_KIND_ANY",
@@ -234,9 +237,8 @@ def random_rules():
 mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
+obj_num = 10
 groupe_name= "Global"
-obj_num = 100
-
 
 
 random_rules()

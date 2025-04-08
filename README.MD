@@ -11,6 +11,13 @@
     
     1.3. Добавляем правила: `random_rules.py`
 
+    1.4. Добавляем сложные правила `random_complex_rules.py`
+    > по умолчанию: 5 dst IP;   5 src IP;    5 service;    1 app
+    Количество меняется изменение k:
+    random_id_dict_services = random.sample(id_dict_services, k=5)
+    random_dest_objects = random.sample(dest_objects,  k=5)
+    random_src_objects = random.sample(src_objects,  k=5)
+
 По умолчанию объекты и правила добавляются в **pre** в группу **Global**.
 
 ---
@@ -38,4 +45,5 @@ mgmt_ip     = "192.168.1.100"  # IP-адрес системы управлени
 mgmt_login  = "admin"          # Логин
 mgmt_pass   = "Password"       # Пароль
 obj_num     = 100              # Количество добавляемых объектов
+groupe_name = "Global"         # Группа в которую будут грузиться объекты и правила. Надо учитывать что правила должны грузиться в группу где созданы объекты
 ```
