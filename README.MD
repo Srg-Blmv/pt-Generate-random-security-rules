@@ -15,8 +15,7 @@
     > по умолчанию: 5 dst IP;   5 src IP;    5 service;    1 app
     Количество меняется изменение k:
     random_id_dict_services = random.sample(id_dict_services, k=5)
-    random_dest_objects = random.sample(dest_objects,  k=5)
-    random_src_objects = random.sample(src_objects,  k=5)
+
 
 По умолчанию объекты и правила добавляются в **pre** в группу **Global**.
 
