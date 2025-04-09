@@ -82,9 +82,6 @@ def main():
         else:
             print(f"Error: {response.status_code} - {response.text} - ID RULE: {i}")
 
-
-
-
 mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"

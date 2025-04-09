@@ -1,10 +1,7 @@
 import requests
 import random
-import ipaddress
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-
 
 
 global_gr_id = ""
@@ -66,24 +63,31 @@ def get_app():
         print(f"Error: {response.status_code} - {response.text}")
         exit()
 
+
+
 def get_ip():
     # ---------------------  GET IP ----------------------
     url = f"https://{mgmt_ip}:443/api/v2/ListNetworkObjects"
     payload = {
         "deviceGroupId": global_gr_id,
-        "objectKinds": ["OBJECT_NETWORK_KIND_IPV4_ADDRESS"],
+        "objectKinds": ["OBJECT_NETWORK_KIND_IPV4_ADDRESS","OBJECT_NETWORK_KIND_IPV4_RANGE","OBJECT_NETWORK_KIND_FQDN","OBJECT_NETWORK_KIND_GEO_ADDRESS"],
         "offset": 0,
-        "limit": 10000
+        "limit": 100000
     }
 
     response = requests.request("POST", url, json=payload, headers=headers, cookies=cookies, verify=False)
 
     if response.status_code == 200:
         data = response.json()
-        #print(data)
-        dest_objects = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Dest")]
-        src_objects = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Source")]
-        return dest_objects, src_objects
+        dest_ip = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Dest_ip")]
+        src_ip = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Source_ip")]
+        dest_net = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Dest_net")]
+        src_net = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Source_net")]
+        dest_range = [obj["id"] for obj in data["ranges"] if obj["name"].startswith("Dest_range")]
+        src_range = [obj["id"] for obj in data["ranges"] if obj["name"].startswith("Source_range")]
+        fqdn = [obj["id"] for obj in data["fqdnAddresses"] if obj["name"].startswith("fqdn")]
+
+        return dest_ip, src_ip, dest_net, src_net, dest_range, src_range, fqdn
     else:
         print(f"Error: {response.status_code} - {response.text}")
         exit()
@@ -135,6 +139,26 @@ def get_zones():
 
     
 
+def get_url():
+# ---------------------  GET URL ----------------------
+
+    url = f"https://{mgmt_ip}:443/api/v2/ListURLCategories"
+
+    payload = {
+        "offset": 0,
+        "limit": 10000
+    }
+
+    response = requests.request("POST", url, json=payload,  headers=headers, cookies=cookies, verify=False)
+
+    if response.status_code == 200:
+        data = response.json()
+        urls = [item["id"] for item in data["urlCategories"]]
+        return urls
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        exit()
+
 
 
 def random_rules():
@@ -146,15 +170,32 @@ def random_rules():
   #----------add rules ----------- 
   url_serv  = f"https://{mgmt_ip}/api/v2/CreateSecurityRule"
 
-  dest_objects, src_objects = get_ip()
+  dest_ip, src_ip, dest_net, src_net, dest_range, src_range, fqdn = get_ip()
   id_dict_services = get_service()
   zones = get_zones()
   app = get_app()
+  urls = get_url()
 
   for i in range(obj_num):
     random_id_dict_services = random.sample(id_dict_services, k=5)
-    random_dest_objects = random.sample(dest_objects, k=5)
-    random_src_objects = random.sample(src_objects, k=5)
+    random_url = random.choice(urls)
+    # ----------  DST  ------------
+    dest_ip_lst = random.sample(dest_ip,k=2)
+    dest_ip_1, dest_ip_2 = dest_ip_lst
+
+    dest_net_1 = random.choice(dest_net)
+    dest_range_1 = random.choice(dest_range)
+    fqdn_lst = random.sample(fqdn, k=2) 
+    fqdn_1, fqdn_2 = fqdn_lst
+
+    # ----------  SRC  ------------
+    src_ip_lst = random.sample(src_ip, k=2)
+    src_ip_1, src_ip_2 = src_ip_lst
+    src_net_1 = random.choice(src_net)
+    src_range_1 = random.choice(src_range)
+
+
+    
     random_action = random.choice(possible_action)
     random_log = random.choice(possible_log)
     random_zone_src = random.choice(zones)
@@ -187,7 +228,13 @@ def random_rules():
         "kind": "RULE_KIND_LIST",
         "objects": {
             "array": 
-                random_src_objects
+            [
+                src_ip_1, 
+                src_ip_2, 
+                src_net_1, 
+                src_range_1,
+                fqdn_2
+            ]
             
         }
     },
@@ -195,8 +242,13 @@ def random_rules():
         "kind": "RULE_KIND_LIST",
         "objects": {
             "array": 
-                random_dest_objects
-            
+            [
+                dest_ip_1, 
+                dest_ip_2, 
+                dest_net_1, 
+                dest_range_1,
+                fqdn_1
+            ]
         }
     },
     "sourceUser": {
@@ -219,8 +271,12 @@ def random_rules():
         }
     },
     "urlCategory": {
-        "kind": "RULE_KIND_ANY",
-        "objects": {}
+        "kind": "RULE_KIND_LIST",
+        "objects": {
+        "array": [
+                random_url
+            ]
+        }
     },
     "action": random_action,
     "logMode": random_log
@@ -229,16 +285,23 @@ def random_rules():
     
     headers = {"Content-Type": "application/json"}
     response_ser = requests.post(url_serv, json=payload, headers=headers, verify=False, cookies=cookies)
-    print(f"Random_Rule_{i}: {response_ser.json()}")
 
+    data = response_ser.json()
+    if 'code' in data:
+        print(f"Random_Rule_{i}: {response_ser.json()}")
+        print()
+        print(payload)
+        print()
+    else:
+        print(f"Random_Rule_{i}: {response_ser.json()}")
 
+  
 
-
-mgmt_ip = "10.13.107.129"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
-mgmt_pass = "P0sitive!"
-obj_num = 10
-groupe_name= "100K"
+mgmt_pass = "xxXX1234$"
+groupe_name= "Global"
+obj_num = 100
 
 
 random_rules()

@@ -48,26 +48,6 @@ def get_id_groupe(groups):
 
 
 
-def get_app():
-    # ---------------------  GET APP ----------------------
-    url = f"https://{mgmt_ip}:443//api/v2/ListApplications"
-    payload = {
-        "deviceGroupId": global_gr_id,
-        "offset": 0,
-        "limit": 10000
-    }
-
-    response = requests.request("POST", url, json=payload, headers=headers, cookies=cookies, verify=False)
-
-    if response.status_code == 200:
-        data = response.json()
-        #print(data)
-        app =  [item["id"] for item in data["applications"]]
-        return app 
-    else:
-        print(f"Error: {response.status_code} - {response.text}")
-        exit()
-
 def get_ip():
     # ---------------------  GET IP ----------------------
     url = f"https://{mgmt_ip}:443/api/v2/ListNetworkObjects"
