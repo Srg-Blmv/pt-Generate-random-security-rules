@@ -71,14 +71,17 @@ def get_rules():
 def main():
     auth()
     id_rules = get_rules()
+    id_rules = id_rules[::-1]
+    x = 0
     for i in id_rules:
+        x += 1
         url = f"https://{mgmt_ip}:443/api/v2/DeleteSecurityRule"
         payload = {
             "id": i
         }
         response = requests.request("POST", url, json=payload,  headers=headers, cookies=cookies, verify=False)
         if response.status_code == 200:
-            print(f"del: {i}")
+            print(f"del {x} : {i}")
         else:
             print(f"Error: {response.status_code} - {response.text} - ID RULE: {i}")
 

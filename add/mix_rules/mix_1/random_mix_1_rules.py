@@ -57,41 +57,8 @@ def get_app():
     if response.status_code == 200:
         data = response.json()
         #print(data)
-        excluded_prefixes = ['zettahost',
-                            'windows-defender-atp',
-                            'wargaming',
-                            'tenable',
-                            'thwapr',
-                            'solarwinds',
-                            'slack',
-                            'qq',
-                            'proofhub',
-                            'openai',
-                            'nateon-im',
-                            'myspace',
-                            'ms-office365',
-                            'mlb',
-                            'mongodb',
-                            'lotuslive',
-                            'last',
-                            'github',
-                            'firmex',
-                            'filer',
-                            'facebook',
-                            'filemix',
-                            'draw',
-                            'daum',
-                            'close',
-                            'azure',
-                            'ask',
-                            'aim-express',
-                            '51']
-        app = [
-            item["id"] 
-            for item in data["applications"] 
-            if not any(item["name"].startswith(prefix) for prefix in excluded_prefixes)
-        ]
-        return app
+        app =  [item["id"] for item in data["applications"]]
+        return app 
     else:
         print(f"Error: {response.status_code} - {response.text}")
         exit()
