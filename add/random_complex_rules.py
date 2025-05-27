@@ -10,6 +10,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 global_gr_id = ""
 cookies = ""
 headers = {"Content-Type": "application/json"}
+payload = {}
 
 def auth():
     global global_gr_id, cookies
@@ -23,8 +24,9 @@ def auth():
     response_auth = requests.post(url, json=payload, headers=headers, verify=False)
     if response_auth.status_code == 200:
         print("auth ok")
+        payload = {}
         url =  f"https://{mgmt_ip}/api/v2/GetDeviceGroupsTree"
-        r = requests.post(url, headers=headers, verify=False, cookies=response_auth.cookies)
+        r = requests.post(url, headers=headers, json=payload, verify=False, cookies=response_auth.cookies)
         cookies = response_auth.cookies
         # ПОЛУЧАЕМ ID глобальной группы
         global_gr_id = get_id_groupe(r.json()['groups'][0])
@@ -234,11 +236,11 @@ def random_rules():
 
 
 
-mgmt_ip = "10.13.107.129"
+mgmt_ip = "192.168.212.10"
 mgmt_login =  "admin"
-mgmt_pass = "P0sitive!"
-obj_num = 10
-groupe_name= "100K"
+mgmt_pass = "xxXX1234$"
+obj_num = 100
+groupe_name= "Global"
 
 
 random_rules()

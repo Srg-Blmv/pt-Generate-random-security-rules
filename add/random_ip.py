@@ -10,7 +10,6 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 global_gr_id = ""
 cookies = ""
 
-
 def auth():
     global global_gr_id, cookies
 
@@ -25,8 +24,9 @@ def auth():
     response_auth = requests.post(url, json=payload, headers=headers, verify=False)
     if response_auth.status_code == 200:
         print("auth ok")
+        payload = {}
         url =  f"https://{mgmt_ip}/api/v2/GetDeviceGroupsTree"
-        r = requests.post(url, headers=headers, verify=False, cookies=response_auth.cookies)
+        r = requests.post(url, headers=headers, json=payload, verify=False, cookies=response_auth.cookies)
         cookies = response_auth.cookies
         # ПОЛУЧАЕМ ID глобальной группы
         global_gr_id = get_id_groupe(r.json()['groups'][0])
