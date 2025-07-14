@@ -49,7 +49,7 @@ def get_rules():
     # -----------   GET LIST RULES -------------------
     url = f"https://{mgmt_ip}:443/api/v2/ListSecurityRules"
     payload = {
-        "limit": 10000,
+        "limit": 100000,
         "deviceGroupId": global_gr_id,
         "precedence": "pre"
     }
