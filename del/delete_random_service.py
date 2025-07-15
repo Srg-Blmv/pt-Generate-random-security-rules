@@ -55,7 +55,7 @@ def get_service():
     
         "objectOriginKinds": ["OBJECT_ORIGIN_KIND_CUSTOM"],
         "offset": 0,
-        "limit": 10000
+        "limit": 50000
     }
 
     id_dict_services = []
@@ -64,11 +64,12 @@ def get_service():
     if response.status_code == 200:
         data = response.json()
 
-        #id_dict_services = [obj["id"] for obj in data["services"] ]  - если  надо удалить все сервисы, но нижний цикл for надо закоментировать.
-
-        for i in data["services"]:
-            if "r_" in i.get('name'):
-                id_dict_services.append(i.get('id'))
+        if delete_all:
+            id_dict_services = [obj["id"] for obj in data["services"] ]
+        else: 
+            for i in data["services"]:
+                if "r_" in i.get('name'):
+                    id_dict_services.append(i.get('id'))
         return id_dict_services
     else:
         print(f"Error: {response.status_code} - {response.text}")
@@ -78,23 +79,27 @@ def get_service():
 def remove_service():
     auth()
     # ---------------  DEL service r_ ----------------
+    count = 0
     id_dict_services = get_service()
     for i in id_dict_services:
+        count += 1
         url = f"https://{mgmt_ip}:443/api/v2/DeleteService"
         payload = {
             "id": i
         }
         response = requests.request("POST", url, json=payload,  headers=headers, cookies=cookies, verify=False)
         if response.status_code == 200:
-            print(f"del: {i}")
+            print(f"{count}: remove id {i}")
         else:
             print(f"Error: {response.status_code} - {response.text} - ID RULE: {i}")
 
 
-mgmt_ip = "192.168.212.10"
+mgmt_ip = "192.168.212.101"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 groupe_name = "Global"
+delete_all = 0                 # Если False удалит OBJECT_ORIGIN_KIND_CUSTOM в названии которых "r_"  
+                               # Если True  удалить все объекты типа OBJECT_ORIGIN_KIND_CUSTOM. 
 
 
 remove_service()

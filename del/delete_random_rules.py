@@ -57,11 +57,12 @@ def get_rules():
     id_rules = []
     if response.status_code == 200:
         data = response.json()
-
-        #id_rules = [obj["id"] for obj in data["items"]] список всех правил для удаления.
-        for i in data["items"]:
-            if "Random_Rule" in i.get('name'):
-                id_rules.append(i.get('id'))
+        if delete_all:
+            id_rules = [obj["id"] for obj in data["items"]]
+        else:
+            for i in data["items"]:
+                if "Random_Rule" in i.get('name'):
+                    id_rules.append(i.get('id'))
 
         return id_rules
     else:
@@ -73,23 +74,27 @@ def main():
     auth()
     id_rules = get_rules()
     id_rules = id_rules[::-1]
-    x = 0
+    count = 0
     for i in id_rules:
-        x += 1
+        count += 1
         url = f"https://{mgmt_ip}:443/api/v2/DeleteSecurityRule"
         payload = {
             "id": i
         }
         response = requests.request("POST", url, json=payload,  headers=headers, cookies=cookies, verify=False)
         if response.status_code == 200:
-            print(f"del {x} : {i}")
+             print(f"{count}: remove id {i}")
         else:
             print(f"Error: {response.status_code} - {response.text} - ID RULE: {i}")
 
-mgmt_ip = "192.168.212.10"
+
+
+
+mgmt_ip = "192.168.212.101"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 groupe_name = "Global"
-
+delete_all = 0                # Если False удалит SecurityRules в названии которых есть "Random_Rule".  
+                              # Если True  удалить все  SecurityRules. 
 
 main()

@@ -213,11 +213,11 @@ def random_rules():
 
 
 
-mgmt_ip = "192.168.212.10"
+mgmt_ip = "192.168.212.101"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 groupe_name= "Global"
-obj_num = 100
+obj_num = 20
 
 
 

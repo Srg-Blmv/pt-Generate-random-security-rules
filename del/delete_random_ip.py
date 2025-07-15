@@ -53,15 +53,17 @@ def get_ip():
         "deviceGroupId": global_gr_id,
         "objectKinds": ["OBJECT_NETWORK_KIND_IPV4_ADDRESS"],
         "offset": 0,
-        "limit": 10000
+        "limit": 50000
     }
 
     response = requests.request("POST", url, json=payload, headers=headers, cookies=cookies, verify=False)
 
     if response.status_code == 200:
         data = response.json()
-        #print(data)
-        dest_src_objects = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Dest") or obj["name"].startswith("Source")]
+        if delete_all:
+            dest_src_objects = [obj["id"] for obj in data["addresses"]]
+        else:
+            dest_src_objects = [obj["id"] for obj in data["addresses"] if obj["name"].startswith("Dest") or obj["name"].startswith("Source")]
         return dest_src_objects
     else:
         print(f"Error: {response.status_code} - {response.text}")
@@ -72,23 +74,27 @@ def get_ip():
 def remove_ip():
     auth()
     dest_src_objects = get_ip()
+    count = 0
     for i in dest_src_objects:
+        count += 1
         url = f"https://{mgmt_ip}:443/api/v2/DeleteNetworkObject"
         payload = {
             "id": i
         }
         response = requests.request("POST", url, json=payload,  headers=headers, cookies=cookies, verify=False)
         if response.status_code == 200:
-            print(f"del: {i}")
+            print(f"{count}: remove id {i}")
         else:
             print(f"Error: {response.status_code} - {response.text} - ID RULE: {i}")
 
 
 
 
-mgmt_ip = "192.168.212.10"
+mgmt_ip = "192.168.212.101"
 mgmt_login =  "admin"
 mgmt_pass = "xxXX1234$"
 groupe_name = "Global"
+delete_all = 0                  # Если False удалит IPV4_ADDRESS в названии которых есть Dest или  Source.  
+                                # Если True  удалить все объекты типа IPV4_ADDRESS. 
 
 remove_ip()
